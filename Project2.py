@@ -37,7 +37,7 @@ def Dijkstra(Startx, Starty, Goalx, Goaly):
   visited = []
 
   # Begin BFS loop to explore nodal tree (aka run search while there are nodes to search)
-  while len(o_pen) > 0:
+  while o.qsize() > 0:
 
     # Pop first node from open list
     now = o.get()
@@ -45,8 +45,11 @@ def Dijkstra(Startx, Starty, Goalx, Goaly):
     # Add popped node to visited list
     visited.append(now)
 
+    currentNode = tuple(now)
+    nodeState = currentNode[3]
+
     # End while loop if goal node is reached
-    if now[3] == Goal:
+    if nodeState[0] == Goalx and nodeState[1] == Goaly:
       print('')
       print('Reached Goal State --- Updating Data Files')
       print('')
@@ -54,9 +57,6 @@ def Dijkstra(Startx, Starty, Goalx, Goaly):
       print('')
       break
     
-    currentNode = now.copy()
-    nodeState = currentNode[3]
-
     [a, cost] = newNodes(nodeState)
     i = 0
 
@@ -65,12 +65,14 @@ def Dijkstra(Startx, Starty, Goalx, Goaly):
       if maybeNode not in visited:
 
         if inObstacle(maybeNode) == False:
+          print(maybeNode)
           ctoc = calcCost(parentnodeindex, visited)
           o.put((ctoc+cost[i], nodeindex, parentnodeindex, maybeNode))
           nodeindex = nodeindex + 1
-          i = i + 1
+        i = i + 1
         
       elif maybeNode in visited:
+        
         ctoc = calcCost(parentnodeindex, visited)
         h = 0
 
@@ -81,17 +83,19 @@ def Dijkstra(Startx, Starty, Goalx, Goaly):
             ogCost = k[0]
 
             if (ctoc+cost[i]) < ogCost:
+              #print(maybeNode)
               o.queue[h][0] == ctoc+cost[i]
               o.queue[h][1] == nodeindex
               o.queue[h][2] == parentnodeindex
           
           h = h +1
+        i = i + 1
 
 ###---------------------------------------###
 
 def newNodes(nodeState):
 
-  node = nodeState.copy()
+  node = tuple(nodeState)
   x = node[0]
   y = node[1]
   a = []
@@ -120,11 +124,38 @@ def newNodes(nodeState):
 
 def inObstacle(maybeNode):
 
-  node = maybeNode.copy()
+  node = tuple(maybeNode)
+  xnode = node[0]
+  ynode = node[1]
   vibes = False
 
-  # If node in obstacle rages ......
+  # check if in map
+  if xnode < 5 and xnode > 1195 and ynode < 5 and ynode > 495:
+    vibes = True
 
+  # check first obstacle (rectangle)
+  elif xnode > 95 and xnode < 180 and ynode > 95 and ynode <= 500:
+    vibes = True
+
+  # check second obstacle (rectangle)
+  elif xnode > 270 and xnode < 355 and ynode >= 0 and ynode < 405:
+    vibes = True
+
+  # check third obstacle (hexagon)
+  elif xnode > 515 and xnode < 785 and ((15/26)*xnode - ynode + 325) <= 0 and ((-15/26)*xnode - ynode + 400) <= 0 and ((-15/26)*xnode - ynode + 175) >= 0 and ((15/26)*xnode - ynode + 100) >= 0:
+    vibes = True
+
+# The next three compose the concave fourth obstacle
+  elif xnode > 895 and xnode < 1025 and ynode > 370 and ynode < 455:
+    vibes = True
+
+  elif xnode > 895 and xnode < 1025 and ynode > 45 and ynode < 130:
+    vibes = True
+  
+  elif xnode > 1015 and xnode < 1105 and ynode > 45 and ynode < 455:
+    vibes = True
+
+  # return "vibes". False = node is in free space. True = node is out of map or in obstacle.
   return vibes
 
 ###---------------------------------------###
@@ -142,6 +173,10 @@ def calcCost(parentindexnode, visited):
 
         parentcost = item[0]
         case = True
-        #break need?????
+        break
 
+  return parentcost
 ###---------------------------------------###
+
+Dijkstra(5, 5, 9, 9)
+print('hell yeah')
