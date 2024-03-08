@@ -2,6 +2,8 @@ import numpy as np
 from queue import PriorityQueue
 import time
 import matplotlib.pyplot as plt
+import cv2
+
 
 def Dijkstra(Startx, Starty, Goalx, Goaly):
 
@@ -54,7 +56,6 @@ def Dijkstra(Startx, Starty, Goalx, Goaly):
     # Add popped node to closed dictionary
     closed[nodeState] = parentcost, currentNode[1], currentNode[2], nodeState
 
-    #nodeindex = nodeindex + 1
 
     # End while loop if goal node is reached
     if nodeState[0] == Goalx and nodeState[1] == Goaly:
@@ -87,7 +88,6 @@ def Dijkstra(Startx, Starty, Goalx, Goaly):
             '''
             nodeindex = nodeindex + 1
             ope.put((round((parentcost+c), 2), nodeindex, parentnodeindex, maybeNode))
-            #print((round((parentcost+c), 2), nodeindex, parentnodeindex, maybeNode))
             openCheck.add(maybeNode)
             
 
@@ -104,19 +104,7 @@ def Dijkstra(Startx, Starty, Goalx, Goaly):
         
         if j[0] > (parentcost+c):
           nodeindex = nodeindex + 1
-          #closed[maybeNode] = parentcost+c, j[1], parentnodeindex, j[3]
           closed[maybeNode] = parentcost+c, nodeindex, parentnodeindex, j[3]
-  '''
-  print(ope.queue)
-  print('')
-  print(closed)
-  
-  print(len(ope.queue))
-  print('')
-  print(len(closed))
-  '''
-
-  #print(closed)
 
   return closed
 ###---------------------------------------###
@@ -203,8 +191,6 @@ def BackTrack(closed, Startx, Starty, Goalx, Goaly):
   startNode = (Startx, Starty)
 
   goalInfo = closed.get(goalNode)
-  #print('')
-  #print(goalInfo)
 
   nodeState = goalInfo[3]
   parent = goalInfo[2]
@@ -225,8 +211,6 @@ def BackTrack(closed, Startx, Starty, Goalx, Goaly):
         pathy.append(coord[1])
         parent = item[2]
         nodeState = coord
-        #print('')
-        #print(nodeState)
         break
 
   pathx.reverse()
@@ -239,21 +223,17 @@ def BackTrack(closed, Startx, Starty, Goalx, Goaly):
 
 start = time.time()
 
-#Dijkstra(635, 400, 665, 400)
-
 Startx = 5
 
 Starty = 5
 
-Goalx = 700
+Goalx = 650
 
 Goaly = 50
 
 closed = Dijkstra(Startx, Starty, Goalx, Goaly)
 
 [pathx, pathy] = BackTrack(closed, Startx, Starty, Goalx, Goaly)
-
-#print(Dijkstra(5, 5, 12, 12))
 
 end = time.time()
 
@@ -263,11 +243,95 @@ print('')
 print(end-start)
 print('')
 
+###---------------------------------------###
+
+green = (31, 80, 12)
+blue = (255, 0, 0)
+red = (0, 0, 255)
+orange = (0, 105, 30)
+yellow = (255,0,205)
+white = (255, 255, 255)
+
+map= np.ones((500,1200,3), dtype=np.uint8)
+map = 255*map
+
+# First Obstacle
+#cv2.rectangle(map, (100,500), (175,100), green, 1)
+cv2.rectangle(map, (100,0), (175,400), green, -1)
+
+# Second Obstacle
+cv2.rectangle(map, (275,100), (350,500), green, -1)
+
+# Third Obstacle
+hexpts = np.array([[520, 325], [650, 400], [780, 325], [780, 175], [650, 100], [520, 175]])
+hexpts = hexpts.reshape(-1,1,2)
+cv2.fillPoly(map, [hexpts], green)
+
+# Fourth Obstacle
+concavepts = np.array([[900, 450], [1100, 450], [1100, 50], [900, 50], [900, 125], [1020, 125], [1020, 375], [900, 375]])
+concavepts = concavepts.reshape(-1,1,2)
+cv2.fillPoly(map, [concavepts], green)
+
+# 5 pixel buffer
+
+# First Obstacle
+cv2.rectangle(map, (95,5), (180,405), red, 3)
+
+# Second Obstacle
+cv2.rectangle(map, (270,500), (355,95), red, 3)
+
+# Third Obstacle
+hexpts = np.array([[515, 330], [650, 405], [785, 330], [785, 170], [650, 95], [515, 170]])
+hexpts = hexpts.reshape(-1,1,2)
+cv2.polylines(map, [hexpts], isClosed=True, thickness=3, color=red)
+
+# Fourth Obstacle
+concavepts = np.array([[895, 455], [1105, 455], [1105, 45], [895, 45], [895, 130], [1015, 130], [1015, 370], [895, 370]])
+concavepts = concavepts.reshape(-1,1,2)
+cv2.polylines(map, [concavepts], isClosed=True, thickness=3, color=red)
+
+
+# map border
+cv2.rectangle(map, (0,0), (1200,500), yellow, 3)
+
+# map border
+cv2.rectangle(map, (5,495), (1195, 5), (0,0,0), 1)
+
+for key in closed:
+  information = closed.get(key)
+  coord = information[3]
+  x = coord[0]
+  y = 500-coord[1]
+  cv2.drawMarker(map, (x,y), color = [0, 165, 255], thickness=2, markerType= cv2.MARKER_SQUARE, line_type=cv2.LINE_AA, markerSize=1)
+  cv2.imshow("map", map)
+  #print('here')
+  #image = pyautogui.screenshot()
+  #image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+  #height, width, layers = image.shape
+  #size = (width,height)
+  #img_array.append(image)
+
+# Print Path
+
+for x1,y1 in zip(pathx,pathy):
+  cv2.drawMarker(map, (x1,500-y1), color = [0, 0, 0], thickness=2, markerType= cv2.MARKER_SQUARE, line_type=cv2.LINE_AA, markerSize=1)
+  cv2.imshow("map", map)
+
+cv2.waitKey(0)
+  #image = pyautogui.screenshot()
+  #image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+  #height, width, layers = image.shape
+  #size = (width,height)
+  #image_array.append(image)
+
+
+###---------------------------------------###
+'''
 plt.plot(pathx, pathy, label='path') # plots T1 w/respect to time
 plt.xlabel("x") # labels the plot's x-axis
 plt.ylabel("y") # labels the plot's y-axis
 plt.show()
-
+'''
 '''
 DICT1
 key = (node, index, parent index)
