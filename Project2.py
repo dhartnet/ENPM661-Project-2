@@ -3,6 +3,7 @@ from queue import PriorityQueue
 import time
 import matplotlib.pyplot as plt
 import cv2
+import os
 
 
 def Dijkstra(Startx, Starty, Goalx, Goaly):
@@ -227,7 +228,7 @@ Startx = 5
 
 Starty = 5
 
-Goalx = 650
+Goalx = 200
 
 Goaly = 50
 
@@ -245,6 +246,8 @@ print('')
 
 ###---------------------------------------###
 
+# Plot It All! 
+
 green = (31, 80, 12)
 blue = (255, 0, 0)
 red = (0, 0, 255)
@@ -252,8 +255,8 @@ orange = (0, 105, 30)
 yellow = (255,0,205)
 white = (255, 255, 255)
 
-map= np.ones((500,1200,3), dtype=np.uint8)
-map = 255*map
+map = np.ones((500,1200,3), dtype=np.uint8) # blank map
+map = 255*map # make it white
 
 # First Obstacle
 #cv2.rectangle(map, (100,500), (175,100), green, 1)
@@ -290,43 +293,63 @@ concavepts = np.array([[895, 455], [1105, 455], [1105, 45], [895, 45], [895, 130
 concavepts = concavepts.reshape(-1,1,2)
 cv2.polylines(map, [concavepts], isClosed=True, thickness=3, color=red)
 
-
 # map border
 cv2.rectangle(map, (0,0), (1200,500), yellow, 3)
 
-# map border
+# map border + 5 pixel buffer
 cv2.rectangle(map, (5,495), (1195, 5), (0,0,0), 1)
 
+# empty image array to store frames
+
+image_array = []
+
+# loop through closed coordinates and plot one by one on the map
 for key in closed:
   information = closed.get(key)
   coord = information[3]
   x = coord[0]
   y = 500-coord[1]
   cv2.drawMarker(map, (x,y), color = [0, 165, 255], thickness=2, markerType= cv2.MARKER_SQUARE, line_type=cv2.LINE_AA, markerSize=1)
-  cv2.imshow("map", map)
+  #cv2.imshow("map", map)
   #print('here')
-  #image = pyautogui.screenshot()
-  #image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-  #height, width, layers = image.shape
-  #size = (width,height)
-  #img_array.append(image)
 
-# Print Path
+  # Trying to take images of the map for each iteration and add image to an array ... it's not working
+  image = pyautogui.screenshot()
+  image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+  height, width, layers = image.shape
+  size = (width,height)
+  image_array.append(image)
+
+# loop through optimized Path coordinates and plot one by one on the map
 
 for x1,y1 in zip(pathx,pathy):
   cv2.drawMarker(map, (x1,500-y1), color = [0, 0, 0], thickness=2, markerType= cv2.MARKER_SQUARE, line_type=cv2.LINE_AA, markerSize=1)
-  cv2.imshow("map", map)
 
-cv2.waitKey(0)
-  #image = pyautogui.screenshot()
-  #image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-  #height, width, layers = image.shape
-  #size = (width,height)
-  #image_array.append(image)
+  # Trying to take images of the map for each iteration and add image to an array ... it's not working
+  image = pyautogui.screenshot()
+  image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+  height, width, layers = image.shape
+  size = (width,height)
+  image_array.append(image)
 
+# Define video file
+out = cv2.VideoWriter(cv2.VideoWriter('scenario1.mp4',cv2.VideoWriter_fourcc(*'DIVX'), 15, size))
+ 
+# Add frames to video ... also not working
+for i in range(len(image_array)):
+  out.write(image_array[i])
+out.release()
+
+#cv2.imshow("map", map)
+#cv2.waitKey(0)
 
 ###---------------------------------------###
+
 '''
+
+NOTES FOR FURTURE IMPLIMENTATION
+
+
 plt.plot(pathx, pathy, label='path') # plots T1 w/respect to time
 plt.xlabel("x") # labels the plot's x-axis
 plt.ylabel("y") # labels the plot's y-axis
@@ -345,5 +368,4 @@ search dict2 for node
 use (node, index, parent index) to search dict 1
 
 remove both entries from both dictionaires
-
 update both dictionaries - replace cost and parent index and index if lower'''
