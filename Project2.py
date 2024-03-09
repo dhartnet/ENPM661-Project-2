@@ -303,46 +303,19 @@ for key in closed:
   y = 500-coord[1]
   cv2.drawMarker(map, (x,y), color = [0, 165, 255], thickness=2, markerType= cv2.MARKER_SQUARE, line_type=cv2.LINE_AA, markerSize=1)
   out.write(map)
-  #cv2.imshow("map", map)
   if cv2.waitKey(1) & 0xFF == ord('s'): 
     break
-  #print('here')
-
-  # Trying to take images of the map for each iteration and add image to an array ... it's not working
-  '''
-  image = pyautogui.screenshot()
-  image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-  height, width, layers = image.shape
-  size = (width,height)
-  image_array.append(image)'''
 
 # loop through optimized Path coordinates and plot one by one on the map
 
 for x1,y1 in zip(pathx,pathy):
   cv2.drawMarker(map, (x1,500-y1), color = [0, 0, 0], thickness=2, markerType= cv2.MARKER_SQUARE, line_type=cv2.LINE_AA, markerSize=1)
   out.write(map)
-  #cv2.imshow("map", map)
   if cv2.waitKey(1) & 0xFF == ord('s'): 
     break
-  # Trying to take images of the map for each iteration and add image to an array ... it's not working
-  '''
-  image = pyautogui.screenshot()
-  image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-  height, width, layers = image.shape
-  size = (width,height)
-  image_array.append(image)'''
-
-
- 
-# Add frames to video ... also not working
-#for i in range(len(image_array)):
-#  out.write(image_array[i])
 
 cv2.destroyAllWindows() 
 out.release()
-
-#cv2.imshow("map", map)
-#cv2.waitKey(0)
 
 ###---------------------------------------###
 
