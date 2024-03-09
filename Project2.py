@@ -5,6 +5,14 @@ import matplotlib.pyplot as plt
 import cv2
 import os
 
+Startx = int(input('Starting X Coordinate:  '))
+print('')
+Starty = int(input('Starting Y Coordinate:  '))
+print('')
+Goalx = int(input('Goal X Coordinate: '))
+print('')
+Goaly = int(input('Goal Y Coordinate: '))
+print('')
 
 def Dijkstra(Startx, Starty, Goalx, Goaly):
 
@@ -81,12 +89,6 @@ def Dijkstra(Startx, Starty, Goalx, Goaly):
 
           if maybeNode not in openCheck:
 
-            '''
-            print(' ')
-            print('New Node')
-            print(maybeNode)
-            print('')
-            '''
             nodeindex = nodeindex + 1
             ope.put((round((parentcost+c), 2), nodeindex, parentnodeindex, maybeNode))
             openCheck.add(maybeNode)
@@ -94,12 +96,6 @@ def Dijkstra(Startx, Starty, Goalx, Goaly):
 
       # if node is already in the closed list, compare costs and update values as necessary 
       else:
-        '''
-        print('')
-        print('checking old node')
-        print(maybeNode)
-        print('')
-        '''
 
         j = closed.get(maybeNode)
         
@@ -224,14 +220,6 @@ def BackTrack(closed, Startx, Starty, Goalx, Goaly):
 
 start = time.time()
 
-Startx = 5
-
-Starty = 5
-
-Goalx = 200
-
-Goaly = 50
-
 closed = Dijkstra(Startx, Starty, Goalx, Goaly)
 
 [pathx, pathy] = BackTrack(closed, Startx, Starty, Goalx, Goaly)
@@ -303,6 +291,10 @@ cv2.rectangle(map, (5,495), (1195, 5), (0,0,0), 1)
 
 image_array = []
 
+# Define video file
+
+out = cv2.VideoWriter( "dhartnet_Project2.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 20, (1200, 500)) 
+
 # loop through closed coordinates and plot one by one on the map
 for key in closed:
   information = closed.get(key)
@@ -310,34 +302,43 @@ for key in closed:
   x = coord[0]
   y = 500-coord[1]
   cv2.drawMarker(map, (x,y), color = [0, 165, 255], thickness=2, markerType= cv2.MARKER_SQUARE, line_type=cv2.LINE_AA, markerSize=1)
+  out.write(map)
   #cv2.imshow("map", map)
+  if cv2.waitKey(1) & 0xFF == ord('s'): 
+    break
   #print('here')
 
   # Trying to take images of the map for each iteration and add image to an array ... it's not working
+  '''
   image = pyautogui.screenshot()
   image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
   height, width, layers = image.shape
   size = (width,height)
-  image_array.append(image)
+  image_array.append(image)'''
 
 # loop through optimized Path coordinates and plot one by one on the map
 
 for x1,y1 in zip(pathx,pathy):
   cv2.drawMarker(map, (x1,500-y1), color = [0, 0, 0], thickness=2, markerType= cv2.MARKER_SQUARE, line_type=cv2.LINE_AA, markerSize=1)
-
+  out.write(map)
+  #cv2.imshow("map", map)
+  if cv2.waitKey(1) & 0xFF == ord('s'): 
+    break
   # Trying to take images of the map for each iteration and add image to an array ... it's not working
+  '''
   image = pyautogui.screenshot()
   image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
   height, width, layers = image.shape
   size = (width,height)
-  image_array.append(image)
+  image_array.append(image)'''
 
-# Define video file
-out = cv2.VideoWriter(cv2.VideoWriter('scenario1.mp4',cv2.VideoWriter_fourcc(*'DIVX'), 15, size))
+
  
 # Add frames to video ... also not working
-for i in range(len(image_array)):
-  out.write(image_array[i])
+#for i in range(len(image_array)):
+#  out.write(image_array[i])
+
+cv2.destroyAllWindows() 
 out.release()
 
 #cv2.imshow("map", map)
