@@ -1,3 +1,6 @@
+# Dustin Hartnett - ENPM661 Project 2
+# Github Repository: https://github.com/dhartnet/ENPM661-Project-2 
+
 import numpy as np
 from queue import PriorityQueue
 import time
