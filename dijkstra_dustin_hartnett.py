@@ -357,28 +357,3 @@ cv2.destroyAllWindows()
 out.release()
 
 ###---------------------------------------###
-
-'''
-
-NOTES FOR FURTURE IMPLIMENTATION
-
-
-plt.plot(pathx, pathy, label='path') # plots T1 w/respect to time
-plt.xlabel("x") # labels the plot's x-axis
-plt.ylabel("y") # labels the plot's y-axis
-plt.show()
-'''
-'''
-DICT1
-key = (node, index, parent index)
-value = cost
-
-DICT2
-key = node
-value (index, parent index)
-
-search dict2 for node
-use (node, index, parent index) to search dict 1
-
-remove both entries from both dictionaires
-update both dictionaries - replace cost and parent index and index if lower'''
