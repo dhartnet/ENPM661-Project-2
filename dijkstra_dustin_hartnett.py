@@ -5,7 +5,6 @@ import numpy as np
 from queue import PriorityQueue
 import time
 import cv2
-import os
 
 # Input start and goal coordinates 
 
